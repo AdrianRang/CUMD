@@ -77,6 +77,8 @@ I will now write a quote
 
 I made fuller example.
 Check out [this](/style.cmds) style file and [this](input.cmdf) input file for this output:
+![image](https://github.com/user-attachments/assets/65037a6d-a1ae-4015-b70f-68bd880583f2)
+
 
 
 ## TODO LIST:
