@@ -1,0 +1,11 @@
+# Heading
+## Subheading
+Plain text including non-interrupt keys like > and ! and # nl
+And can skip a line
+> I am a quote
+That is a quote
+! I am a red quote
+Recusivity is possible
+! > quote inside a red quote
+Or a better example nl nl
+> quote nl from root nl ! red quote nl from the other quote nl > quote nl from the red quote

@@ -1,0 +1,29 @@
+> : quote / recursive {
+   <div style="display:flex;">
+       <div style="
+                   width: 2px;
+                   border-radius: 10%;
+                   margin-right: 5px;
+                   background-color: gray;"
+       ></div>
+   <span>{{content}}</span>
+   </div>
+}
+
+! : red_quote / recursive {
+    <div style="display:flex;">
+       <div style="
+                   width: 5px;
+                   border-radius: 10%;
+                   margin-right: 5px;
+                   background-color: red;"
+       ></div>
+   <span>{{content}}</span>
+   </div>
+}
+
+# : heading {<h1>{{content}}</h1>}
+
+## : subheading {<h2>{{content}}</h2>}
+
+nl : new-line / replace-recursive {<br>}
