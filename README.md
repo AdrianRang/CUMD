@@ -75,8 +75,10 @@ I will now write a quote
 >[!CAUTION]
   New Lines haven't been implemented completeley but there is a workaround
 
+### Pre-made example
+
 I made fuller example.
-Check out [this](/style.cmds) style file and [this](input.cmdf) input file for this output:
+Check out [this](/example-style.cmds) style file and [this](example-input.cmdf) input file for this output:
 ![image](https://github.com/user-attachments/assets/65037a6d-a1ae-4015-b70f-68bd880583f2)
 
 
