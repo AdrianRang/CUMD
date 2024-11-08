@@ -1,4 +1,4 @@
-> : quote / recursive {
+> : quote / recursive{
    <div style="display:flex;">
        <div style="
                    width: 2px;
@@ -25,5 +25,11 @@
 # : heading {<h1>{{content}}</h1>}
 
 ## : subheading {<h2>{{content}}</h2>}
+
+` : code / until ` {<code>{{content}}</code>}
+
+** : italic / until ** / recursive {<i>{{content}}<i>}
+
+* : bold / until * / recursive {<b>{{content}}</b>}
 
 nl : new-line / replace-recursive {<br>}

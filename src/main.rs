@@ -91,7 +91,7 @@ fn main() {
     println!("{:?}", elements);
 
     let mut output = std::fs::File::create_new(args.output).expect("Error creating output file");
-    loop {
+    for _ in 0..input_file.lines().count() {
         let curr = match input.next() {
             Option::None => {break;}
             Option::Some(val) => val
@@ -107,67 +107,102 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
     let mut out: String = String::new();
 
     let mut found_key = false;
-        for element in elements {
-            match element.modifiers.get(0) {
-                Some(modi) => {
-                    match modi {
-                        Modifier::Recursive => {
-                            if match curr.split_ascii_whitespace().next() {
-                                Some(n) => n,
-                                None => {continue;},
-                            } == element.key{
-                                let content = gen_output(elements, &curr.replacen(element.key.as_str(), "", 1));
-                                out += element.html.0.as_str();
-                                out += content.as_str();
-                                out += element.html.1.as_str();
+    for element in elements {
+        match element.modifiers.get(0) {
+            Some(modi) => {
+                match modi {
+                    Modifier::Recursive => {
+                        if match curr.split_ascii_whitespace().next() {
+                            Some(n) => n,
+                            None => {continue;},
+                        } == element.key{
+                            let content = gen_output(elements, &curr.replacen(element.key.as_str(), "", 1));
+                            out += element.html.0.as_str();
+                            out += content.as_str();
+                            out += element.html.1.as_str();
+                            found_key = true;
+                        }
+                    },
+                    Modifier::Interrupt => {
+                        if curr.contains(element.key.as_str()) {
+                            let full_content = curr.split_at(curr.find(&element.key).expect("msg"));
+                            let content = full_content.0.replace(element.key.as_str(), "");
+                            out += element.html.0.as_str();
+                            out += content.as_str();
+                            out += element.html.1.as_str();
+                            // out += full_content.1.replace(element.key.as_str(), "").replace("!", "").as_str();
+                            // out += full_content.1.replace(element.key.as_str(), "").split_at(match full_content.1.find("\n") {Some(num) => {num}, None => full_content.1.len()}).0;
+                            found_key = true;
+                        }
+                    },
+                    Modifier::Until(val) => {
+                        if curr.contains(&element.key) {
+                            if element.modifiers.contains(&Modifier::Recursive){
+                                let snips = curr.split(&element.key);
+                                let mut content: Vec<&str> = Vec::new();
+                                for snip in snips {
+                                    content.push(snip.splitn(1, val).next().expect("no finish"));
+                                }
+                                println!("{:?}", content);
+                                for i in 0..content.len() {
+                                    if i % 2 == 1 {
+                                        out += &element.html.0;
+                                        out += &gen_output(elements, content[i]);
+                                        out += &element.html.1;
+                                    } else {
+                                        out += &gen_output(elements, content[i]);
+                                    }
+                                }
+                                found_key = true;
+                            } else {
+                                let snips = curr.split(&element.key);
+                                let mut content: Vec<&str> = Vec::new();
+                                for snip in snips {
+                                    content.push(snip.splitn(1, val).next().expect("no finish"));
+                                }
+                                println!("{:?}", content);
+                                for i in 0..content.len() {
+                                    if i % 2 == 1 {
+                                        out += &element.html.0;
+                                        out += content[i];
+                                        out += &element.html.1;
+                                    } else {
+                                        out += &gen_output(elements, content[i]);
+                                    }
+                                }
                                 found_key = true;
                             }
-                        },
-                        Modifier::Interrupt => {
-                            if curr.contains(element.key.as_str()) {
-                                let full_content = curr.split_at(curr.find(&element.key).expect("msg"));
-                                let content = full_content.0.replace(element.key.as_str(), "");
-                                out += element.html.0.as_str();
-                                out += content.as_str();
-                                out += element.html.1.as_str();
-                                // out += full_content.1.replace(element.key.as_str(), "").replace("!", "").as_str();
-                                // out += full_content.1.replace(element.key.as_str(), "").split_at(match full_content.1.find("\n") {Some(num) => {num}, None => full_content.1.len()}).0;
-                                found_key = true;
-                            }
-                        },
-                        Modifier::ReplaceRecursive => {
-                            if curr.contains(&element.key){
-                                let content = curr.split_at(curr.find(&element.key).expect("impossible"));
-                                out += content.0;
-                                out += &element.html.0;
-                                out += gen_output(elements, content.1.replacen(&element.key, "", 1).as_str()).as_str();
-                                // out += curr.replace(&element.key, &element.html.0).as_str();
-                                found_key = true;
-                            }
-                        },
-                        Modifier::Until(_val) => {
-                            panic!("The modifier 'until' is still Unimplemented.")
-                        },
-                    }
-                }
-                _ => {
-                    if match curr.split_ascii_whitespace().next() {
-                        Some(n) => n,
-                        None => {continue;},
-                    } == element.key {
-                        let content = curr.replacen(element.key.as_str(), "", 1);
-                        out += element.html.0.as_str();
-                        out += content.as_str();
-                        out += element.html.1.as_str();
-                        found_key = true;
-                    }
+                        }
+                    },
+                    Modifier::ReplaceRecursive => {
+                        if curr.contains(&element.key){
+                            let content = curr.split_at(curr.find(&element.key).expect("impossible"));
+                            out += content.0;
+                            out += &element.html.0;
+                            out += gen_output(elements, content.1.replacen(&element.key, "", 1).as_str()).as_str();
+                            // out += curr.replace(&element.key, &element.html.0).as_str();
+                            found_key = true;
+                        }
+                    },
                 }
             }
-            if found_key {break;}
+            _ => {
+                if match curr.split_ascii_whitespace().next() {
+                    Some(n) => n,
+                    None => {continue;},
+                } == element.key {
+                    let content = curr.replacen(element.key.as_str(), "", 1);
+                    out += element.html.0.as_str();
+                    out += content.as_str();
+                    out += element.html.1.as_str();
+                    found_key = true;
+                }
+            }
         }
-        if !found_key {
-            out += curr;
-        }
-        return out;
+        if found_key {break;}
+    }
+    if !found_key {
+        out += curr;
+    }
+    return out;
 }
-

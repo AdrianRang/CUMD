@@ -3,9 +3,11 @@
 Plain text including non-interrupt keys like > and ! and # nl
 And can skip a line
 > I am a quote
-That is a quote
+That is a quote  
 ! I am a red quote
-Recusivity is possible
+Recusivity is possible 
 ! > quote inside a red quote
-Or a better example nl nl
+nl nl Or a better example
 > quote nl from root nl ! red quote nl from the other quote nl > quote nl from the red quote
+nl nl
+code `maybe` more than `once` you use `nl` and *bold* and **italic** and ***both*** nl nl
