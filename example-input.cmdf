@@ -10,4 +10,6 @@ Recusivity is possible
 nl nl Or a better example
 > quote nl from root nl ! red quote nl from the other quote nl > quote nl from the red quote
 nl nl
-code `maybe` more than `once` you use `nl` and *bold* and **italic** and ***both*** nl nl
+code `maybe` more than `once` you use `nl and \`` and *bold* and **italic** and ***both*** nl nl
+and it is writen like this nl nl
+`code \`maybe\` more than \`once\` you use \`nl\` and *bold* and **italic** and ***both***`

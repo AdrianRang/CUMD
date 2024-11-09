@@ -28,7 +28,7 @@
 
 ` : code / until ` {<code>{{content}}</code>}
 
-** : italic / until ** / recursive {<i>{{content}}<i>}
+** : italic / until ** / recursive {<i>{{content}}</i>}
 
 * : bold / until * / recursive {<b>{{content}}</b>}
 

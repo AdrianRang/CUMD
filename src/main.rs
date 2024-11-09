@@ -30,7 +30,10 @@ enum Modifier {
     Until(String),
 }
 
+const ESCAPE_CHAR: &str = "\\";
+
 fn main() {
+
     let args = CLi::parse();
 
     let input_file = std::fs::read_to_string(&args.input).expect("could not read file");
@@ -138,7 +141,9 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                     Modifier::Until(val) => {
                         if curr.contains(&element.key) {
                             if element.modifiers.contains(&Modifier::Recursive){
-                                let snips = curr.split(&element.key);
+                                let escape_key = ESCAPE_CHAR.to_string() + &element.key;
+                                let replaced_curr = curr.replace(&escape_key, "¬¡“£¢∞§");
+                                let snips = replaced_curr.split(&element.key);
                                 let mut content: Vec<&str> = Vec::new();
                                 for snip in snips {
                                     content.push(snip.splitn(1, val).next().expect("no finish"));
@@ -147,15 +152,17 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                                 for i in 0..content.len() {
                                     if i % 2 == 1 {
                                         out += &element.html.0;
-                                        out += &gen_output(elements, content[i]);
+                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &element.key);
                                         out += &element.html.1;
                                     } else {
-                                        out += &gen_output(elements, content[i]);
+                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &element.key);
                                     }
                                 }
                                 found_key = true;
                             } else {
-                                let snips = curr.split(&element.key);
+                                let escape_key = ESCAPE_CHAR.to_string() + &element.key;
+                                let replaced_curr = curr.replace(&escape_key, "¬¡“£¢∞§");
+                                let snips = replaced_curr.split(&element.key);
                                 let mut content: Vec<&str> = Vec::new();
                                 for snip in snips {
                                     content.push(snip.splitn(1, val).next().expect("no finish"));
@@ -164,7 +171,7 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                                 for i in 0..content.len() {
                                     if i % 2 == 1 {
                                         out += &element.html.0;
-                                        out += content[i];
+                                        out += &content[i].replace("¬¡“£¢∞§",&element.key);
                                         out += &element.html.1;
                                     } else {
                                         out += &gen_output(elements, content[i]);
