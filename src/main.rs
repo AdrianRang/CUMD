@@ -24,7 +24,7 @@ struct Element {
 
 #[derive(Debug, PartialEq)]
 enum Modifier {
-    Recursive/*(String)*/,
+    Recursive,
     Interrupt,
     ReplaceRecursive,
     Until(String),
@@ -60,7 +60,7 @@ fn main() {
                         nickname = s0.next().expect("msg").to_string();
                     } else if val == "/" {
                         modifiers.push(match s0.next().expect("Syntax Error"){
-                            "recursive" => Modifier::Recursive/*(s0.next().expect("Expected stopping value for modifier 'recursive").to_string())*/,
+                            "recursive" => Modifier::Recursive,
                             "interrupt" => Modifier::Interrupt,
                             "replace-recursive"   => Modifier::ReplaceRecursive,
                             "until" => Modifier::Until(s0.next().expect("expect value for modifier 'until'").to_string()),
@@ -91,7 +91,7 @@ fn main() {
         });
     }
 
-    println!("{:?}", elements);
+    // println!("{:?}", elements);
 
     let mut output = std::fs::File::create_new(args.output).expect("Error creating output file");
     for _ in 0..input_file.lines().count() {
@@ -118,11 +118,25 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                         if match curr.split_ascii_whitespace().next() {
                             Some(n) => n,
                             None => {continue;},
-                        } == element.key{
-                            let content = gen_output(elements, &curr.replacen(element.key.as_str(), "", 1));
+                        } == element.key {
+                            let mut until = String::from("nlnl");
+                            for modifier in &element.modifiers {
+                                match modifier {
+                                    Modifier::Until(val) => {until = val.to_string()},
+                                    _ => continue,
+                                }
+                            }
+                            println!("{:?}", until);
+                            let replaced_curr = curr.replacen(element.key.as_str(), "", 1);
+                            let mut split_content = replaced_curr.split(&until);
+                            let content = gen_output(&elements, split_content.next().expect("smth went wrong"));
                             out += element.html.0.as_str();
                             out += content.as_str();
                             out += element.html.1.as_str();
+                            out += match split_content.next() {
+                                Some(val) => val,
+                                None => "",
+                            };
                             found_key = true;
                         }
                     },
@@ -148,7 +162,6 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                                 for snip in snips {
                                     content.push(snip.splitn(1, val).next().expect("no finish"));
                                 }
-                                println!("{:?}", content);
                                 for i in 0..content.len() {
                                     if i % 2 == 1 {
                                         out += &element.html.0;
@@ -167,7 +180,6 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                                 for snip in snips {
                                     content.push(snip.splitn(1, val).next().expect("no finish"));
                                 }
-                                println!("{:?}", content);
                                 for i in 0..content.len() {
                                     if i % 2 == 1 {
                                         out += &element.html.0;

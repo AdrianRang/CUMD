@@ -84,9 +84,9 @@ Check out [this](/example-style.cmds) style file and [this](example-input.cmdf) 
 
 
 ## TODO LIST:
-- [ ] Let `recursive` modifier go into next lines stopping at a predefined value [EX. > : quote / recursive doublenewline { ... } will take everithing as content until reaching the end condition]
-- [ ] Related with ^ but implement `until x` modifier that will take content untill `x` is seen.
-- [ ] stop until document ends not until an empty line [BUG] change `loop` to `for` main ln:94
+- [almost] Let `recursive` modifier go into next lines stopping at a predefined value [EX. > : quote / recursive / until doublenewline { ... } will take everithing as content until reaching the end condition]
+- [x] Related with ^ but implement `until x` modifier that will take content untill `x` is seen.
+- [x] stop until document ends not until an empty line [BUG] change `loop` to `for` main ln:94
 - [ ] Think of a way to implement tables.
   
 ## Future Ideas

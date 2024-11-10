@@ -1,4 +1,4 @@
-> : quote / recursive{
+> : quote / recursive {
    <div style="display:flex;">
        <div style="
                    width: 2px;
