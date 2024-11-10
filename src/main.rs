@@ -26,7 +26,7 @@ struct Element {
 enum Modifier {
     Recursive,
     Interrupt,
-    ReplaceRecursive,
+    newLine,
     Until(String),
 }
 
@@ -37,7 +37,6 @@ fn main() {
     let args = CLi::parse();
 
     let input_file = std::fs::read_to_string(&args.input).expect("could not read file");
-    let mut input = input_file.split("\n");
     let style_file = std::fs::read_to_string(&args.style).expect("could not read file");
 
     let statements = style_file.split("}\n\n");
@@ -62,7 +61,7 @@ fn main() {
                         modifiers.push(match s0.next().expect("Syntax Error"){
                             "recursive" => Modifier::Recursive,
                             "interrupt" => Modifier::Interrupt,
-                            "replace-recursive"   => Modifier::ReplaceRecursive,
+                            "new-line"   => Modifier::newLine,
                             "until" => Modifier::Until(s0.next().expect("expect value for modifier 'until'").to_string()),
                             _ => panic!("Unknown modifier")
                         });
@@ -76,7 +75,7 @@ fn main() {
 
         let html;
 
-        if modifiers.contains(&Modifier::ReplaceRecursive) {
+        if modifiers.contains(&Modifier::newLine) {
             html = (s1.next().expect("html is empty").replace("{", "").replace("}", ""), String::new());
         } else {
             html = (s1.next().expect("no motr spliut").replace("{", ""), 
@@ -94,16 +93,18 @@ fn main() {
     // println!("{:?}", elements);
 
     let mut output = std::fs::File::create_new(args.output).expect("Error creating output file");
-    for _ in 0..input_file.lines().count() {
-        let curr = match input.next() {
-            Option::None => {break;}
-            Option::Some(val) => val
-        };
+    // for _ in 0..input_file.lines().count() {
+    //     let curr = match input.next() {
+    //         Option::None => {break;}
+    //         Option::Some(val) => val
+    //     };
 
-        output.write_all(gen_output(&elements, curr).as_bytes()).expect("");        
+    //     output.write_all(gen_output(&elements, curr).as_bytes()).expect("");        
 
-        // output.write_all(b"<br>\n").expect("Eroor writing to file");
-    }
+    //     // output.write_all(b"<br>\n").expect("Eroor writing to file");
+    // }
+    println!("{:?}", input_file);
+    output.write_all(gen_output(&elements, &input_file).as_bytes()).expect("msg");
 }
 
 fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
@@ -119,24 +120,25 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                             Some(n) => n,
                             None => {continue;},
                         } == element.key {
-                            let mut until = String::from("nlnl");
+                            println!("{:?}", element.key);
+                            let mut until = String::from("\\\\");
                             for modifier in &element.modifiers {
                                 match modifier {
                                     Modifier::Until(val) => {until = val.to_string()},
                                     _ => continue,
                                 }
                             }
-                            println!("{:?}", until);
+                            println!("{:?}", curr);
                             let replaced_curr = curr.replacen(element.key.as_str(), "", 1);
-                            let mut split_content = replaced_curr.split(&until);
-                            let content = gen_output(&elements, split_content.next().expect("smth went wrong"));
+                            let mut split_content = replaced_curr.splitn(2, &until);
+                            let content = gen_output(&elements, split_content.next().expect("smth went wromng"));
                             out += element.html.0.as_str();
                             out += content.as_str();
                             out += element.html.1.as_str();
-                            out += match split_content.next() {
+                            out += &gen_output(&elements, match split_content.next() {
                                 Some(val) => val,
                                 None => "",
-                            };
+                            });
                             found_key = true;
                         }
                     },
@@ -154,6 +156,7 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                     },
                     Modifier::Until(val) => {
                         if curr.contains(&element.key) {
+                            println!("until");
                             if element.modifiers.contains(&Modifier::Recursive){
                                 let escape_key = ESCAPE_CHAR.to_string() + &element.key;
                                 let replaced_curr = curr.replace(&escape_key, "¬¡“£¢∞§");
@@ -165,10 +168,10 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                                 for i in 0..content.len() {
                                     if i % 2 == 1 {
                                         out += &element.html.0;
-                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &element.key);
+                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &escape_key);
                                         out += &element.html.1;
                                     } else {
-                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &element.key);
+                                        out += &gen_output(elements, content[i]).replace("¬¡“£¢∞§", &escape_key);
                                     }
                                 }
                                 found_key = true;
@@ -193,9 +196,11 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                             }
                         }
                     },
-                    Modifier::ReplaceRecursive => {
+                    Modifier::newLine => {
                         if curr.contains(&element.key){
+                            println!("newLine");
                             let content = curr.split_at(curr.find(&element.key).expect("impossible"));
+                            println!("{:?}", curr);
                             out += content.0;
                             out += &element.html.0;
                             out += gen_output(elements, content.1.replacen(&element.key, "", 1).as_str()).as_str();
@@ -210,10 +215,18 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                     Some(n) => n,
                     None => {continue;},
                 } == element.key {
-                    let content = curr.replacen(element.key.as_str(), "", 1);
+                    let replaced = curr.replacen(element.key.as_str(), "", 1);
+                    let content = replaced.split_at(match curr.find("\n"){
+                        Some(val) => val,
+                        None => 0,
+                    });
                     out += element.html.0.as_str();
-                    out += content.as_str();
+                    out += &content.0.replace("\n", "");
                     out += element.html.1.as_str();
+                    println!("none");
+                    println!("{:?}", content.0);
+                    out += "\n";
+                    out += &gen_output(&elements, content.1);
                     found_key = true;
                 }
             }
@@ -221,6 +234,8 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
         if found_key {break;}
     }
     if !found_key {
+        println!("plain text");
+        println!("{:?}", curr);
         out += curr;
     }
     return out;

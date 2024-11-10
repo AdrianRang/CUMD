@@ -32,4 +32,4 @@
 
 * : bold / until * / recursive {<b>{{content}}</b>}
 
-nl : new-line / replace-recursive {<br>}
+\ : new-line / new-line {<br>}
