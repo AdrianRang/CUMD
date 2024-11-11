@@ -1,22 +1,28 @@
 # Heading
 ## Subheading
 
-Plain text including non-interrupt keys like > and ! and # \
-And can skip a line \
-> I am a quote \\
-That is a quote \
-! I am a red quote \\
-Recusivity is possible \
-! > quote inside a red quote \\\
-Or a better example: \
-> quote \ from root \
-  ! red quote \
-    from the other quote \
-    > quote \
+Plain text including non-interrupt keys like > and ! and #  
+And can skip a line  
+> I am a quote   
+  
+That is a quote  
+! I am a red quote  
+  
+Recusivity is possible   
+
+! > quote inside a red quote \\  
+
+Or a better example:  
+
+> quote \ from root  
+  ! red quote  
+    from the other quote  
+    > quote  
       from the red quote \\
 
 \\
 
-code `maybe` more than `once` you use `nl and \`` and *bold* and **italic** and ***both**  \\
-And it is writen like this \\
+code `maybe` more than `once` you use `nl and \`` and *bold* and **italic** and ***both**  
+  
+And it is writen like this: \\
 `code \`maybe\` more than \`once\` you use \`nl\` and *bold* and **italic** and ***both***`

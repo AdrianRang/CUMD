@@ -104,7 +104,7 @@ fn main() {
     //     // output.write_all(b"<br>\n").expect("Eroor writing to file");
     // }
     println!("{:?}", input_file);
-    output.write_all(gen_output(&elements, &input_file).as_bytes()).expect("msg");
+    output.write_all(gen_output(&elements, &input_file.replace("  \n", "\\")).as_bytes()).expect("msg");
 }
 
 fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
