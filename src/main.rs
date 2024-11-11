@@ -9,9 +9,12 @@ struct CLi {
     style: std::path::PathBuf,
     /// The input path
     input: std::path::PathBuf,
-    /// the name that will be given to the output file
-    #[arg(default_value("output.html"))]
-    output: String,
+    /// The name that will be given to the output file
+    #[arg(default_value("./output.html"))]
+    output: std::path::PathBuf,
+    /// The html format file
+    #[arg(default_value(None))]
+    format: Option<std::path::PathBuf>,
 }
 
 #[derive(Debug)]
@@ -26,7 +29,7 @@ struct Element {
 enum Modifier {
     Recursive,
     Interrupt,
-    newLine,
+    NewLine,
     Until(String),
 }
 
@@ -36,6 +39,26 @@ fn main() {
 
     let args = CLi::parse();
 
+    if args.input.extension() != Some(std::ffi::OsString::from("cmdf").as_ref()) {
+        match args.input.extension() {
+            Some(val) => {
+                panic!("Wrong extension '{}' for input file", val.to_str().expect("msg"));
+            },
+            None => {
+                panic!("Input file must have extension 'cmdf'");
+            }
+        }
+    }
+    if args.style.extension() != Some(std::ffi::OsString::from("cmds").as_ref()) {
+        match args.style.extension() {
+            Some(val) => {
+                panic!("Wrong extension '{}' for style file, expected 'cmds'", val.to_str().expect("msg"));
+            },
+            None => {
+                panic!("Style file must have extension 'cmds'");
+            }
+        }
+    }
     let input_file = std::fs::read_to_string(&args.input).expect("could not read file");
     let style_file = std::fs::read_to_string(&args.style).expect("could not read file");
 
@@ -61,7 +84,7 @@ fn main() {
                         modifiers.push(match s0.next().expect("Syntax Error"){
                             "recursive" => Modifier::Recursive,
                             "interrupt" => Modifier::Interrupt,
-                            "new-line"   => Modifier::newLine,
+                            "new-line"   => Modifier::NewLine,
                             "until" => Modifier::Until(s0.next().expect("expect value for modifier 'until'").to_string()),
                             _ => panic!("Unknown modifier")
                         });
@@ -75,7 +98,7 @@ fn main() {
 
         let html;
 
-        if modifiers.contains(&Modifier::newLine) {
+        if modifiers.contains(&Modifier::NewLine) {
             html = (s1.next().expect("html is empty").replace("{", "").replace("}", ""), String::new());
         } else {
             html = (s1.next().expect("no motr spliut").replace("{", ""), 
@@ -104,7 +127,28 @@ fn main() {
     //     // output.write_all(b"<br>\n").expect("Eroor writing to file");
     // }
     println!("{:?}", input_file);
-    output.write_all(gen_output(&elements, &input_file.replace("  \n", "\\")).as_bytes()).expect("msg");
+    let binding = gen_output(&elements, &input_file.replace("  \n", "\\"));
+    let out = &binding.as_bytes();
+
+    let html_format: (String, String) = match &args.format {
+        Some(val) => {
+            let form = std::fs::read_to_string(val).expect("Error reading format file");
+            let mut split_form = form.split("{{cumd}}");
+            (split_form.next().expect("").to_string(), split_form.next().expect("").to_string())
+        },
+        None => (String::from("<!DOCTYPE html> \n") +
+            "<html lang=\"en\"> \n" +
+            "<head> \n" +
+                "<meta charset=\"UTF-8\"> \n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> \n" +
+                "<title>Document</title> \n" +
+            "</head> \n" +
+            "<body>", String::from("</body>") +
+            "</html>")
+    };
+    output.write_all(html_format.0.as_bytes()).expect("Ther was a problem writing the file");
+    output.write_all(out).expect("Ther was a problem writing the file");
+    output.write_all(html_format.1.as_bytes()).expect("Ther was a problem writing the file");
 }
 
 fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
@@ -196,7 +240,7 @@ fn gen_output(elements: &Vec<Element>, curr: &str) -> String {
                             }
                         }
                     },
-                    Modifier::newLine => {
+                    Modifier::NewLine => {
                         if curr.contains(&element.key){
                             println!("newLine");
                             let content = curr.split_at(curr.find(&element.key).expect("impossible"));
