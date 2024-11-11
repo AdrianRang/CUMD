@@ -114,7 +114,8 @@ or check if it matches certain conditions using rust
 ```
 as long as it returns a boolean value.
 
-### CSS
+<!--### CSS
+* Fixed by adding file format (https://github.com/AdrianRang/CUMD/commit/83b77ff05ef81cf1f8e250ad7c5b0bd5563cf875)
 This was part of the original idea that you could add `+css` if you wanted to add css to the element like>
 ```
 > : quote / recursive {
@@ -132,3 +133,4 @@ This was part of the original idea that you could add `+css` if you wanted to ad
 }
 ```
 but maybe its just better to make one global css file with all the styles, and just add it as an optional argument to add to the html.
+-->
