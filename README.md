@@ -1,6 +1,9 @@
 # CUMD
 An easy way to make custom markdown
 
+> [!NOTE]
+> I want to export this as a wasm package but I am having a lot of trouble with it. If anyone can help (or just do it :)) you are welcome to fork or send a pull request, thanks
+
 ## The Essentials
 To run cumd you need to files a style file `style.cmds` and an input `input.cmdf` and the command will generate `output.html` or if you wish to name it differently you can pass the name as an argument to the command.  
 ```
@@ -71,9 +74,6 @@ I will now write a quote
 </div>
 
 ---
-
->[!CAUTION]
-  New Lines haven't been implemented completeley but there is a workaround
 
 ### Pre-made example
 
