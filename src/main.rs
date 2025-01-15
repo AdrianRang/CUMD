@@ -263,6 +263,7 @@ fn main() -> ExitCode {
                 "<meta charset=\"UTF-8\"> \n" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> \n" +
                 "<title>Document</title> \n" +
+                "<link rel=\"stylesheet\" href=\"style.css\">\n" +
             "</head> \n" +
             "<body>", String::from("</body>") +
             "</html>")
